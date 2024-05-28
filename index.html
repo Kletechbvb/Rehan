@@ -23,11 +23,23 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
         }
 
         .table {
             width: 100%;
             border-collapse: collapse;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .table.fade-out {
+            opacity: 0;
+        }
+
+        .table.fade-in {
+            opacity: 1;
         }
 
         .table th, .table td {
@@ -64,7 +76,7 @@
     </div>
     <script>
         const timetable = {
-            Monday: [
+           Monday: [
                 { time: '8:00 - 9:00', subject: 'Engineering Physics' },
                 { time: '9:00 - 10:00', subject: 'Basic Mechanical Engineering' },
                 { time: '10:15 - 11:15', subject: 'Tutorial' },
@@ -105,10 +117,8 @@
 
         function createTimetable(day) {
             const container = document.getElementById('timetable');
-            container.innerHTML = '';  // Clear previous content
-
             const table = document.createElement('table');
-            table.classList.add('table');
+            table.classList.add('table', 'fade-in');
 
             const headerRow = document.createElement('tr');
             const dayHeader = document.createElement('th');
@@ -160,10 +170,47 @@
             return now >= startTime && now <= endTime;
         }
 
+        function getLastClassEndTime(day) {
+            const slots = timetable[day];
+            if (!slots || slots.length === 0) return null;
+
+            const lastSlot = slots[slots.length - 1];
+            const [_, end] = lastSlot.time.split(' - ').map(t => t.trim());
+            const [endHours, endMinutes] = end.split(':').map(Number);
+
+            const now = new Date();
+            return new Date(now.getFullYear(), now.getMonth(), now.getDate(), endHours, endMinutes);
+        }
+
         function updateTimetable() {
             const today = new Date();
-            const day = days[today.getDay()];
-            createTimetable(day);
+            let currentDayIndex = today.getDay();
+            let day = days[currentDayIndex];
+            
+            const lastClassEndTime = getLastClassEndTime(day);
+            if (lastClassEndTime && new Date() > lastClassEndTime) {
+                // Move to the next day
+                currentDayIndex = (currentDayIndex + 1) % 7;
+                day = days[currentDayIndex];
+                changeTimetableWithAnimation(day);
+            } else {
+                createTimetable(day);
+            }
+        }
+
+        function changeTimetableWithAnimation(day) {
+            const container = document.getElementById('timetable');
+            const currentTable = container.querySelector('.table');
+
+            if (currentTable) {
+                currentTable.classList.add('fade-out');
+                currentTable.addEventListener('transitionend', () => {
+                    container.removeChild(currentTable);
+                    createTimetable(day);
+                }, { once: true });
+            } else {
+                createTimetable(day);
+            }
         }
 
         updateTimetable();
