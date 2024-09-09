@@ -19,78 +19,73 @@
             overflow: hidden;
         }
 
-h1 {
-    margin: 0;
-    padding: 10px;
-    font-size: 1.5em;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    text-align: center;
-}
-
-.container {
-    margin-top: 60px; /* Ensure space for the fixed header */
-    padding: 20px;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    position: relative;
-    height: calc(100vh - 60px); /* Full height minus the header */
-    overflow-y: auto; /* Make the list scrollable */
-}
-
-
-        #timetable {
-            padding: 20px;
-            overflow-y: auto;
-            flex-grow: 1;
+        h1 {
+            margin: 0;
+            padding: 15px;
+            font-size: 1.7em;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            text-align: center;
         }
 
-        /* Timetable entry */
+        .container {
+            margin-top: 80px; /* Ensure space for the fixed header */
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #fff;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            position: relative;
+            height: calc(100vh - 80px); /* Full height minus the header */
+            overflow-y: auto; /* Make the list scrollable */
+        }
+
+        /* Timetable entry with more space */
         .timetable-entry {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
+            padding: 15px;
             margin-bottom: 15px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-            font-size: 1em;
+            border-radius: 8px;
+            background-color: #f0f0f0;
             color: #333;
-            transition: background-color 0.3s;
-        }
-
-        .timetable-entry.dull {
-            background-color: #e0e0e0;
-            color: #999;
-        }
-
-        .time {
             font-weight: bold;
-            color: #007bff;
-            margin-right: 10px;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .event {
+        .timetable-entry .time {
             flex: 1;
+            color: #007bff;
+            padding-right: 10px;
+            font-size: 1.1em;
+        }
+
+        .timetable-entry .event {
+            flex: 2;
             text-align: left;
+            font-size: 1.1em;
+        }
+
+        /* Dull style for past events */
+        .dull {
+            opacity: 0.5;
+            color: #999;
+            pointer-events: none; /* Prevent interactions with past events */
+        }
+
+        /* Style for checkboxes */
+        .timetable-entry input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
         }
 
         /* Checkboxes */
-        .checkbox {
-            pointer-events: none; /* Disable all checkboxes initially */
-        }
-
-        .active .checkbox {
-            pointer-events: auto; /* Enable current day's checkboxes */
-        }
-
         input[type="checkbox"] {
             width: 1.5em;
             height: 1.5em;
@@ -117,7 +112,7 @@ h1 {
 
     <script>
         const timetable = {
-             Monday: [
+            Monday: [
                 { time: "8:00 am - 10:00 am", event: "Constitution of India (Class)" },
                 { time: "10:00 am - 4:00 pm", event: "Senior design project" },
                 { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
@@ -178,115 +173,116 @@ h1 {
                 { time: "6:30 pm - 7:30 pm", event: "Study session (Subject 2)" },
                 { time: "7:30 pm - 8:00 pm", event: "Exam/Interview prep" },
                 { time: "8:00 pm - 9:00 pm", event: "Dinner" },
-                { time: "9:00 pm - 10:00 pm", event: "Study session (Subject 3)"},
+                { time: "9:00 pm - 10:00 pm", event: "Study session (Subject 3)" },
                 { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
                 { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
             ],
             Saturday: [
-                { time: "8:00 am - 4:00 pm", event: "Senior design project or flexible project/study time" },
-                { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
-                { time: "5:30 pm - 6:15 pm", event: "Gym/Exercise" },
-                { time: "6:15 pm - 6:30 pm", event: "Prayer break" },
-                { time: "6:30 pm - 7:30 pm", event: "Study session (Subject 2)" },
-                { time: "7:30 pm - 8:00 pm", event: "Exam/Interview prep" },
-                { time: "8:00 pm - 9:00 pm", event: "Dinner" },
-                { time: "9:00 pm - 10:00 pm", event: "Study session (Subject 3)" },
-                { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
-                { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
+                { time: "10:00 am - 11:00 am", event: "Study session (Subject 1)" },
+                { time: "11:00 am - 12:00 pm", event: "Study session (Subject 2)" },
+                { time: "12:00 pm - 1:00 pm", event: "Study session (Subject 3)" },
+                { time: "1:00 pm - 2:00 pm", event: "Lunch" },
+                { time: "2:00 pm - 4:00 pm", event: "Senior design project" },
+                { time: "4:00 pm - 5:00 pm", event: "Gym/Exercise" },
+                { time: "5:00 pm - 6:00 pm", event: "Study session (Subject 1)" },
+                { time: "6:00 pm - 7:00 pm", event: "Dinner" },
+                { time: "7:00 pm - 8:00 pm", event: "Study session (Subject 2)" },
+                { time: "8:00 pm - 9:00 pm", event: "Study session (Subject 3)" },
+                { time: "9:00 pm - 10:00 pm", event: "Job interview preparation" },
+                { time: "10:00 pm - 11:00 pm", event: "Wind down for bed" }
             ],
             Sunday: [
-                { time: "8:00 am - 4:00 pm", event: "Senior design project or flexible project/study time" },
-                { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
-                { time: "5:30 pm - 6:15 pm", event: "Gym/Exercise" },
-                { time: "6:15 pm - 6:30 pm", event: "Prayer break" },
-                { time: "6:30 pm - 7:30 pm", event: "Study session (Subject 2)" },
-                { time: "7:30 pm - 8:00 pm", event: "Exam/Interview prep" },
-                { time: "8:00 pm - 9:00 pm", event: "Dinner" },
-                { time: "9:00 pm - 10:00 pm", event: "Study session (Subject 3)" },
-                { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
-                { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
+                { time: "10:00 am - 11:00 am", event: "Study session (Subject 1)" },
+                { time: "11:00 am - 12:00 pm", event: "Study session (Subject 2)" },
+                { time: "12:00 pm - 1:00 pm", event: "Study session (Subject 3)" },
+                { time: "1:00 pm - 2:00 pm", event: "Lunch" },
+                { time: "2:00 pm - 4:00 pm", event: "Senior design project" },
+                { time: "4:00 pm - 5:00 pm", event: "Gym/Exercise" },
+                { time: "5:00 pm - 6:00 pm", event: "Study session (Subject 1)" },
+                { time: "6:00 pm - 7:00 pm", event: "Dinner" },
+                { time: "7:00 pm - 8:00 pm", event: "Study session (Subject 2)" },
+                { time: "8:00 pm - 9:00 pm", event: "Study session (Subject 3)" },
+                { time: "9:00 pm - 10:00 pm", event: "Job interview preparation" },
+                { time: "10:00 pm - 11:00 pm", event: "Wind down for bed" }
             ]
-            // More days...
         };
 
-        function getTodayTimetable() {
-            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const today = new Date().getDay();
-            return {
-                day: daysOfWeek[today],
-                timetable: timetable[daysOfWeek[today]]
-            };
+        function getDayIndex() {
+            const today = new Date();
+            return today.getDay(); // 0 (Sunday) to 6 (Saturday)
         }
+function updateEventStyles(todayIndex) {
+    const timetableEntries = document.querySelectorAll(".timetable-entry");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of the day
+    
+    timetableEntries.forEach((entry, index) => {
+        const eventTimeText = entry.querySelector(".time").textContent.trim();
+        const [hours, minutes] = eventTimeText.split(':')[0].split(' ')[0].split(':').map(Number);
+        const ampm = eventTimeText.split(':')[1].split(' ')[1].toLowerCase();
+        
+        // Adjust hours for AM/PM
+        const eventHours = (ampm === 'pm' && hours < 12) ? hours + 12 : (ampm === 'am' && hours === 12) ? 0 : hours;
+        
+        const eventDate = new Date(today);
+        eventDate.setHours(eventHours, minutes, 0, 0);
+        
+        const isPastEvent = eventDate < new Date();
+        const isTodayEvent = eventDate.toDateString() === today.toDateString();
+        const checkbox = entry.querySelector("input[type='checkbox']");
+        
+        if (isPastEvent) {
+            entry.classList.add("dull");
+            checkbox.disabled = true;
+        } else {
+            entry.classList.remove("dull");
+            checkbox.disabled = false;
+        }
+    });
+}
+
+
+
+
+function isToday(date) {
+    const today = new Date();
+    return date.getFullYear() === today.getFullYear() &&
+           date.getMonth() === today.getMonth() &&
+           date.getDate() === today.getDate();
+}
+
 
         function renderTimetable(dayIndex) {
-            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             const timetableElement = document.getElementById("timetable");
             const dayTitle = document.getElementById("dayTitle");
-            const todayIndex = new Date().getDay();
-            
-            // Set the day title
-            dayTitle.textContent = daysOfWeek[dayIndex] + "'s Timetable";
-            
-            // Clear previous content
-            timetableElement.innerHTML = "";  
-            
-            // Get the timetable for the selected day
-            const selectedTimetable = timetable[daysOfWeek[dayIndex]];
-            
-            // Render the timetable
+
+            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const selectedDay = daysOfWeek[dayIndex];
+            const selectedTimetable = timetable[selectedDay] || [];
+
+            dayTitle.textContent = `${selectedDay}'s Timetable`;
+
+            timetableElement.innerHTML = "";
+
             selectedTimetable.forEach(entry => {
                 const entryElement = document.createElement("div");
                 entryElement.classList.add("timetable-entry");
 
-                // Make future events dull and disable checkboxes
-                if (dayIndex > todayIndex) {
-                    entryElement.classList.add("dull");
-                } else {
-                    entryElement.classList.add("active");
-                }
-
                 entryElement.innerHTML = `
-                    <input type="checkbox" class="checkbox" ${dayIndex === todayIndex ? '' : 'disabled'}>
-                    <span class="time">${entry.time}:</span>
-                    <span class="event">${entry.event}</span>
+                    <input type="checkbox">
+                    <span class="time">${entry.time}:</span> <span class="event">${entry.event}</span>
                 `;
-                
+
                 timetableElement.appendChild(entryElement);
             });
+
+            updateEventStyles(dayIndex);
         }
 
-        function initCarousel() {
-            let dayIndex = new Date().getDay();  // Default to today
-
-            // Handle swipe gestures for mobile
-            let startX = 0;
-            const timetableElement = document.getElementById("timetable");
-
-            timetableElement.addEventListener("touchstart", (event) => {
-                startX = event.touches[0].clientX;
-            });
-
-            timetableElement.addEventListener("touchend", (event) => {
-                const endX = event.changedTouches[0].clientX;
-                if (startX > endX + 50) {
-                    // Swiped left, show next day
-                    dayIndex = (dayIndex + 1) % 7;
-                    renderTimetable(dayIndex);
-                } else if (startX < endX - 50) {
-                    // Swiped right, show previous day
-                    dayIndex = (dayIndex - 1 + 7) % 7;
-                    renderTimetable(dayIndex);
-                }
-            });
-
-            // Render today's timetable initially
-            renderTimetable(dayIndex);
-        }
-
-        // Initialize the app
+        // Initialize the timetable view with the current day
         document.addEventListener("DOMContentLoaded", () => {
-            // Initialize the timetable carousel
-            initCarousel();
+            const todayIndex = getDayIndex();
+            renderTimetable(todayIndex);
         });
     </script>
 </body>
