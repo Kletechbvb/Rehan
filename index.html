@@ -7,7 +7,7 @@
     <style>
         /* Base styles for light mode */
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #f4f4f9;
             color: #333;
             margin: 0;
@@ -16,103 +16,106 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
+            overflow: hidden;
         }
 
         .container {
-            text-align: center;
-            padding: 20px;
-            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
             background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            position: relative;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
         }
 
         h1 {
-            margin-bottom: 20px;
-            font-size: 1.5em;
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            padding: 20px;
+            font-size: 1.8em;
+            text-align: center;
+            margin: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1;
         }
 
         #timetable {
-            width: 100%;
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
         }
 
-        /* Timetable entry with two columns for mobile view */
+        /* Timetable entry */
         .timetable-entry {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            background-color: #e0e0e0;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            font-size: 1em;
             color: #333;
+            transition: background-color 0.3s;
+        }
+
+        .timetable-entry.dull {
+            background-color: #e0e0e0;
+            color: #999;
+        }
+
+        .time {
             font-weight: bold;
-            text-align: left;
-        }
-
-        .timetable-entry .time {
-            flex: 1;
             color: #007bff;
-            padding-right: 10px;
+            margin-right: 10px;
         }
 
-        .timetable-entry .event {
-            flex: 2;
+        .event {
+            flex: 1;
             text-align: left;
         }
 
-        /* Dark mode styles */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #333;
-                color: #f4f4f9;
-            }
+        /* Checkboxes */
+        .checkbox {
+            pointer-events: none; /* Disable all checkboxes initially */
+        }
 
-            .container {
-                background-color: #444;
-            }
+        .active .checkbox {
+            pointer-events: auto; /* Enable current day's checkboxes */
+        }
 
-            .timetable-entry {
-                background-color: #555;
-                color: #f4f4f9;
-            }
+        input[type="checkbox"] {
+            width: 1.5em;
+            height: 1.5em;
+            appearance: none;
+            background-color: #fff;
+            border: 2px solid #007bff;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+            cursor: pointer;
+        }
 
-            .timetable-entry .time {
-                color: #ffdd57;
-            }
+        input[type="checkbox"]:checked {
+            background-color: #007bff;
+            border-color: #007bff;
         }
     </style>
-    <script>
-    document.addEventListener('copy', function(e) {
-        e.preventDefault();
-    });
-
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-    });
-
-    document.addEventListener('selectstart', function(e) {
-        e.preventDefault();
-    });
-
-    document.addEventListener('touchstart', function(e) {
-        if (e.touches.length > 1) {
-            e.preventDefault();  // Prevents long press copying
-        }
-    }, { passive: false });
-</script>
-
 </head>
 <body>
     <div class="container">
         <h1 id="dayTitle"></h1>
         <div id="timetable"></div>
     </div>
+
     <script>
         const timetable = {
-            Monday: [
+             Monday: [
                 { time: "8:00 am - 10:00 am", event: "Constitution of India (Class)" },
                 { time: "10:00 am - 4:00 pm", event: "Senior design project" },
                 { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
@@ -201,7 +204,7 @@
                 { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
                 { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
             ]
-            // More days can be added here
+            // More days...
         };
 
         function getTodayTimetable() {
@@ -217,6 +220,7 @@
             const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
             const timetableElement = document.getElementById("timetable");
             const dayTitle = document.getElementById("dayTitle");
+            const todayIndex = new Date().getDay();
             
             // Set the day title
             dayTitle.textContent = daysOfWeek[dayIndex] + "'s Timetable";
@@ -231,7 +235,20 @@
             selectedTimetable.forEach(entry => {
                 const entryElement = document.createElement("div");
                 entryElement.classList.add("timetable-entry");
-                entryElement.innerHTML = `<span class="time">${entry.time}:</span> ${entry.event}`;
+
+                // Make future events dull and disable checkboxes
+                if (dayIndex > todayIndex) {
+                    entryElement.classList.add("dull");
+                } else {
+                    entryElement.classList.add("active");
+                }
+
+                entryElement.innerHTML = `
+                    <input type="checkbox" class="checkbox" ${dayIndex === todayIndex ? '' : 'disabled'}>
+                    <span class="time">${entry.time}:</span>
+                    <span class="event">${entry.event}</span>
+                `;
+                
                 timetableElement.appendChild(entryElement);
             });
         }
