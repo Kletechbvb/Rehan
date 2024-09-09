@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mobile Timetable</title>
     <style>
-        /* Base styles for mobile */
+        /* Base styles for light mode */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -63,84 +63,51 @@
             text-align: left;
         }
 
-        /* Switch button styles */
-        .switch {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 60px;
-            height: 34px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #007bff;  /* Light mode active */
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
         /* Dark mode styles */
-        body.dark-mode {
-            background-color: #333;
-            color: #f4f4f9;
-        }
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #333;
+                color: #f4f4f9;
+            }
 
-        body.dark-mode .container {
-            background-color: #444;
-        }
+            .container {
+                background-color: #444;
+            }
 
-        body.dark-mode .timetable-entry {
-            background-color: #555;
-            color: #f4f4f9;
-        }
+            .timetable-entry {
+                background-color: #555;
+                color: #f4f4f9;
+            }
 
-        body.dark-mode .timetable-entry .time {
-            color: #ffdd57;
-        }
-
-        body.dark-mode .switch .slider {
-            background-color: #ffdd57;  /* Dark mode active */
+            .timetable-entry .time {
+                color: #ffdd57;
+            }
         }
     </style>
+    <script>
+    document.addEventListener('copy', function(e) {
+        e.preventDefault();
+    });
+
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+
+    document.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+    });
+
+    document.addEventListener('touchstart', function(e) {
+        if (e.touches.length > 1) {
+            e.preventDefault();  // Prevents long press copying
+        }
+    }, { passive: false });
+</script>
+
 </head>
 <body>
     <div class="container">
         <h1 id="dayTitle"></h1>
-        <label class="switch">
-            <input type="checkbox" id="themeSwitch">
-            <span class="slider"></span>
-        </label>
         <div id="timetable"></div>
     </div>
     <script>
@@ -160,7 +127,7 @@
             ],
             Tuesday: [
                 { time: "8:00 am - 10:00 am", event: "Industrial Data Network (Class)" },
-                { time: "10:15 am - 11:15 am", event: "Mobile Robotics and Perception (Class)" },
+                { time: "10:15 am - 11:15 am", event: "Mobile Robotics Perception" },
                 { time: "11:15 am - 4:00 pm", event: "Senior design project" },
                 { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
                 { time: "5:30 pm - 6:15 pm", event: "Gym/Exercise" },
@@ -185,55 +152,7 @@
                 { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
                 { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
             ],
-            Thursday: [
-                { time: "8:00 am - 4:00 pm", event: "Senior design project" },
-                { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
-                { time: "5:30 pm - 6:15 pm", event: "Gym/Exercise" },
-                { time: "6:15 pm - 6:30 pm", event: "Prayer break" },
-                { time: "6:30 pm - 7:30 pm", event: "Study session (Subject 2)" },
-                { time: "7:30 pm - 8:00 pm", event: "Exam/Interview prep" },
-                { time: "8:00 pm - 9:00 pm", event: "Dinner" },
-                { time: "9:00 pm - 10:00 pm", event: "Study session (Subject 3)" },
-                { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
-                { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
-            ],
-            Friday: [
-                { time: "9:00 am - 10:00 am", event: "Mobile Robotics and Perception (Class)" },
-                { time: "10:00 am - 4:00 pm", event: "Senior design project" },
-                { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
-                { time: "5:30 pm - 6:15 pm", event: "Gym/Exercise" },
-                { time: "6:15 pm - 6:30 pm", event: "Prayer break" },
-                { time: "6:30 pm - 7:30 pm", event: "Study session (Subject 2)" },
-                { time: "7:30 pm - 8:00 pm", event: "Exam/Interview prep" },
-                { time: "8:00 pm - 9:00 pm", event: "Dinner" },
-                { time: "9:00 pm - 10:00 pm", event: "Study session (Subject 3)"},
-                { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
-                { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
-            ],
-            Saturday: [
-                { time: "8:00 am - 4:00 pm", event: "Senior design project or flexible project/study time" },
-                { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
-                { time: "5:30 pm - 6:15 pm", event: "Gym/Exercise" },
-                { time: "6:15 pm - 6:30 pm", event: "Prayer break" },
-                { time: "6:30 pm - 7:30 pm", event: "Study session (Subject 2)" },
-                { time: "7:30 pm - 8:00 pm", event: "Exam/Interview prep" },
-                { time: "8:00 pm - 9:00 pm", event: "Dinner" },
-                { time: "9:00 pm - 10:00 pm", event: "Study session (Subject 3)" },
-                { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
-                { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
-            ],
-            Sunday: [
-                { time: "8:00 am - 4:00 pm", event: "Senior design project or flexible project/study time" },
-                { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
-                { time: "5:30 pm - 6:15 pm", event: "Gym/Exercise" },
-                { time: "6:15 pm - 6:30 pm", event: "Prayer break" },
-                { time: "6:30 pm - 7:30 pm", event: "Study session (Subject 2)" },
-                { time: "7:30 pm - 8:00 pm", event: "Exam/Interview prep" },
-                { time: "8:00 pm - 9:00 pm", event: "Dinner" },
-                { time: "9:00 pm - 10:00 pm", event: "Study session (Subject 3)" },
-                { time: "10:00 pm - 11:00 pm", event: "Job interview preparation" },
-                { time: "11:00 pm - 11:30 pm", event: "Wind down for bed" }
-            ]
+            // More days can be added here
         };
 
         function getTodayTimetable() {
@@ -296,31 +215,8 @@
             renderTimetable(dayIndex);
         }
 
-        function switchTheme() {
-            document.body.classList.toggle("dark-mode");
-
-            // Save the current theme in local storage
-            const isDarkMode = document.body.classList.contains("dark-mode");
-            localStorage.setItem("theme", isDarkMode ? "dark" : "light");
-        }
-
-        function applyStoredTheme() {
-            const storedTheme = localStorage.getItem("theme");
-            if (storedTheme === "dark") {
-                document.body.classList.add("dark-mode");
-                document.getElementById("themeSwitch").checked = true;
-            }
-        }
-
         // Initialize the app
         document.addEventListener("DOMContentLoaded", () => {
-            // Apply the stored theme if any
-            applyStoredTheme();
-
-            // Initialize the theme switch button
-            const themeSwitch = document.getElementById('themeSwitch');
-            themeSwitch.addEventListener('change', switchTheme);
-
             // Initialize the timetable carousel
             initCarousel();
         });
