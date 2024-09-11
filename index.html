@@ -294,23 +294,22 @@ function renderTimetable(dayIndex) {
         let touchEndX = 0;
         let dayIndex = getDayIndex();
 
-        document.addEventListener('touchstart', (event) => {
-            touchStartX = event.touches[0].screenX;
-        });
+    document.addEventListener('touchstart', (event) => {
+    touchStartX = event.touches[0].screenX;
+});
 
-        document.addEventListener('touchend', (event) => {
-            touchEndX = event.changedTouches[0].screenX;
-            const swipeDistance = touchEndX - touchStartX;
-            const swipeThreshold = 100; // Adjust this value to change the swipe sensitivity
-            if (swipeDistance > swipeThreshold) {
-                dayIndex = (dayIndex + 1) % 7; // Swipe right to next day
-            } else if (swipeDistance < -swipeThreshold) {
-                dayIndex = (dayIndex - 1 + 7) % 7; // Swipe left to previous day
-            }
-            renderTimetable(dayIndex);
-        });
+document.addEventListener('touchend', (event) => {
+    touchEndX = event.changedTouches[0].screenX;
+    const swipeDistance = touchEndX - touchStartX;
+    const swipeThreshold = 100; // Adjust this value to change the swipe sensitivity
+    if (swipeDistance > swipeThreshold) {
+        dayIndex = (dayIndex + 1) % 7; // Swipe right to next day
+    } else if (swipeDistance < -swipeThreshold) {
+        dayIndex = (dayIndex - 1 + 7) % 7; // Swipe left to previous day
+    }
+    renderTimetable(dayIndex);
+});
 
-        renderTimetable(dayIndex);
     </script>
 </body>
 </html>
