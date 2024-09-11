@@ -344,6 +344,44 @@ function updateCheckboxState(dayIndex) {
             const todayIndex = getDayIndex();
             renderTimetable(todayIndex);
         };
+
+
+        
+    </script>
+
+        <script>
+        // Your timetable and functions here
+
+        let startX = 0;
+        let currentDayIndex = getDayIndex(); // Initialize with the current day index
+
+        // Detect touch start
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        // Detect touch move and end
+        document.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX;
+            const distance = endX - startX;
+
+            if (Math.abs(distance) > 50) { // Set a threshold to detect meaningful swipes
+                if (distance < 0) {
+                    // Swipe left (next day)
+                    currentDayIndex = (currentDayIndex + 1) % 7; // Loop back to Sunday after Saturday
+                } else {
+                    // Swipe right (previous day)
+                    currentDayIndex = (currentDayIndex - 1 + 7) % 7; // Loop back to Saturday before Sunday
+                }
+
+                renderTimetable(currentDayIndex); // Render the timetable for the new day
+            }
+        });
+
+        // Initialize the timetable view with the current day
+        document.addEventListener("DOMContentLoaded", () => {
+            renderTimetable(currentDayIndex);
+        });
     </script>
 </body>
 </html>
