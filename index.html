@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +21,6 @@
             height: 100vh;
             overflow: hidden;
         }
-
         h1 {
             margin: 0;
             padding: 15px;
@@ -31,7 +33,6 @@
             z-index: 1000;
             text-align: center;
         }
-
         .container {
             margin-top: 80px; /* Ensure space for the fixed header */
             padding: 20px;
@@ -43,9 +44,14 @@
             height: calc(100vh - 80px); /* Full height minus the header */
             overflow-y: auto; /* Make the list scrollable */
         }
-
         /* Timetable entry with more space */
+        .timetable-entry.show {
+    opacity: 1;
+}
+
         .timetable-entry {
+            opacity: 0;
+            transition: opacity 0.3s ease;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -58,33 +64,28 @@
             text-align: left;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
         .timetable-entry .time {
             flex: 1;
             color: #007bff;
             padding-right: 10px;
             font-size: 1.1em;
         }
-
         .timetable-entry .event {
             flex: 2;
             text-align: left;
             font-size: 1.1em;
         }
-
         /* Dull style for past events */
         .dull {
             opacity: 0.5;
             color: #999;
             pointer-events: none; /* Prevent interactions with past events */
         }
-
         /* Style for checkboxes */
         .timetable-entry input[type="checkbox"] {
             margin-right: 10px;
             cursor: pointer;
         }
-
         /* Checkboxes */
         input[type="checkbox"] {
             width: 1.5em;
@@ -97,7 +98,6 @@
             margin-right: 10px;
             cursor: pointer;
         }
-
         input[type="checkbox"]:checked {
             background-color: #007bff;
             border-color: #007bff;
@@ -109,7 +109,6 @@
         <h1 id="dayTitle"></h1>
         <div id="timetable"></div>
     </div>
-
     <script>
         const timetable = {
              Monday: [
@@ -205,33 +204,27 @@
                 { time: "9:00 pm - 10:00 pm", event: "Job interview preparation" },
                 { time: "10:00 pm - 11:00 pm", event: "Wind down for bed" }
             ]
-            // Additional days as needed...
+                        // Add more days as needed...
         };
 
-          function getDayIndex() {
-        const today = new Date();
-        return today.getDay(); // 0 (Sunday) to 6 (Saturday)
-    }
+        function getDayIndex() {
+            const today = new Date();
+            return today.getDay(); // 0 (Sunday) to 6 (Saturday)
+        }
 
         function updateEventStyles(todayIndex) {
             const timetableEntries = document.querySelectorAll(".timetable-entry");
             const today = new Date();
             today.setHours(0, 0, 0, 0); // Reset time to start of the day
-            
             timetableEntries.forEach((entry, index) => {
                 const eventTimeText = entry.querySelector(".time").textContent.trim();
                 const [hours, minutes] = eventTimeText.split(':')[0].split(' ')[0].split(':').map(Number);
-                const ampm = eventTimeText.split(':')[1].split(' ')[1].toLowerCase();
-                
-                // Adjust hours for AM/PM
+                const ampm = eventTimeText.split(':')[1].split(' ')[1].toLowerCase(); // Adjust hours for AM/PM
                 const eventHours = (ampm === 'pm' && hours < 12) ? hours + 12 : (ampm === 'am' && hours === 12) ? 0 : hours;
-                
                 const eventDate = new Date(today);
                 eventDate.setHours(eventHours, minutes, 0, 0);
-                
                 const isPastEvent = eventDate < new Date();
                 const checkbox = entry.querySelector("input[type='checkbox']");
-                
                 if (isPastEvent) {
                     entry.classList.add("dull");
                     checkbox.disabled = true;
@@ -242,141 +235,84 @@
             });
         }
 
-function updateCheckboxState(dayIndex) {
-    const checkboxes = document.querySelectorAll("input[type='checkbox']");
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const currentDay = daysOfWeek[dayIndex];
-
-    checkboxes.forEach((checkbox, index) => {
-        const storageKey = `${currentDay}-checkbox-${index}`; // Include the day in the key
-        const storedState = localStorage.getItem(storageKey);
-        if (storedState !== null) {
-            checkbox.checked = JSON.parse(storedState);
+        function updateCheckboxState(dayIndex) {
+            const checkboxes = document.querySelectorAll("input[type='checkbox']");
+            const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const currentDay = daysOfWeek[dayIndex];
+            checkboxes.forEach((checkbox, index) => {
+                const storageKey = `${currentDay}-checkbox-${index}`; // Include the day in the key
+                const storedState = localStorage.getItem(storageKey);
+                if (storedState !== null) {
+                    checkbox.checked = JSON.parse(storedState);
+                }
+                checkbox.addEventListener('change', () => {
+                    localStorage.setItem(storageKey, checkbox.checked);
+                });
+            });
         }
-        checkbox.addEventListener('change', () => {
-            localStorage.setItem(storageKey, checkbox.checked);
+
+function renderTimetable(dayIndex) {
+    const timetableElement = document.getElementById("timetable");
+    const dayTitle = document.getElementById("dayTitle");
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const selectedDay = daysOfWeek[dayIndex];
+    const selectedTimetable = timetable[selectedDay] || [];
+    dayTitle.textContent = `${selectedDay}`;
+
+    timetableElement.innerHTML = "";  // Clear previous content
+    
+    // Create timetable entries
+    selectedTimetable.forEach((entry, index) => {
+        const entryElement = document.createElement("div");
+        entryElement.classList.add("timetable-entry");
+        entryElement.innerHTML = `
+            <input type="checkbox">
+            <span class="time">${entry.time}:</span>
+            <span class="event">${entry.event}</span>
+        `;
+        timetableElement.appendChild(entryElement);
+    });
+
+    // Trigger fade-in animation after entries are added
+    requestAnimationFrame(() => {
+        const entries = document.querySelectorAll(".timetable-entry");
+        entries.forEach((entry) => {
+            entry.classList.add("show");
         });
     });
+
+    updateEventStyles(dayIndex);
+    updateCheckboxState(dayIndex);
 }
-
-        
-    function renderTimetable(dayIndex) {
-        const timetableElement = document.getElementById("timetable");
-        const dayTitle = document.getElementById("dayTitle");
-
-        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-        const selectedDay = daysOfWeek[dayIndex];
-        const selectedTimetable = timetable[selectedDay] || [];
-
-        dayTitle.textContent = `${selectedDay}`;
-        timetableElement.innerHTML = "";
-
-        selectedTimetable.forEach((entry, index) => {
-            const entryElement = document.createElement("div");
-            entryElement.classList.add("timetable-entry");
-
-            entryElement.innerHTML = `
-                <input type="checkbox">
-                <span class="time">${entry.time}:</span> <span class="event">${entry.event}</span>
-            `;
-
-            timetableElement.appendChild(entryElement);
-        });
-
-        updateEventStyles(dayIndex);
-        updateCheckboxState(dayIndex);
-    }
 
 
         // Swipe gesture logic
-        let xDown = null;
-        let yDown = null;
 
-        function getTouches(evt) {
-            return evt.touches || evt.originalEvent.touches;
-        }
 
-        function handleTouchStart(evt) {
-            const firstTouch = getTouches(evt)[0];
-            xDown = firstTouch.clientX;
-            yDown = firstTouch.clientY;
-        }
 
-        function handleTouchMove(evt) {
-            if (!xDown || !yDown) {
-                return;
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let dayIndex = getDayIndex();
+
+        document.addEventListener('touchstart', (event) => {
+            touchStartX = event.touches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (event) => {
+            touchEndX = event.changedTouches[0].screenX;
+            const swipeDistance = touchEndX - touchStartX;
+            const swipeThreshold = 100; // Adjust this value to change the swipe sensitivity
+            if (swipeDistance > swipeThreshold) {
+                dayIndex = (dayIndex + 1) % 7; // Swipe right to next day
+            } else if (swipeDistance < -swipeThreshold) {
+                dayIndex = (dayIndex - 1 + 7) % 7; // Swipe left to previous day
             }
-
-            const xUp = evt.touches[0].clientX;
-            const yUp = evt.touches[0].clientY;
-
-            const xDiff = xDown - xUp;
-            const yDiff = yDown - yUp;
-
-            if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                if (xDiff > 0) {
-                    showNextDay();
-                } else {
-                    showPreviousDay();
-                }
-            }
-
-            xDown = null;
-            yDown = null;
-        }
-
-        function showNextDay() {
-            let dayIndex = getDayIndex();
-            dayIndex = (dayIndex + 1) % 7;
             renderTimetable(dayIndex);
-        }
+        });
 
-        function showPreviousDay() {
-            let dayIndex = getDayIndex();
-            dayIndex = (dayIndex - 1 + 7) % 7;
-            renderTimetable(dayIndex);
-        }
-
-        document.addEventListener("touchstart", handleTouchStart, false);
-        document.addEventListener("touchmove", handleTouchMove, false);
-
-        window.onload = () => {
-            const todayIndex = getDayIndex();
-            renderTimetable(todayIndex);
-        };
-
-    // Your timetable and functions here
- // Improved swipe gesture logic
-    let startX = 0;
-    let currentDayIndex = getDayIndex(); // Start with the current day
-
-    document.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX; // Record the touch start position
-    });
-
-    document.addEventListener('touchend', (e) => {
-        const endX = e.changedTouches[0].clientX; // Record the touch end position
-        const distance = endX - startX;
-
-        if (Math.abs(distance) > 50) { // Set a threshold to detect meaningful swipes
-            if (distance < 0) {
-                // Swipe left (next day)
-                currentDayIndex = (currentDayIndex + 1) % 7; // Loop back to Sunday after Saturday
-            } else {
-                // Swipe right (previous day)
-                currentDayIndex = (currentDayIndex - 1 + 7) % 7; // Loop back to Saturday before Sunday
-            }
-
-            renderTimetable(currentDayIndex); // Render the timetable for the new day
-        }
-    });
-
-    window.onload = () => {
-        renderTimetable(currentDayIndex); // Initialize with the current day's timetable
-    };
+        renderTimetable(dayIndex);
     </script>
-
-
-    
 </body>
 </html>
+
+
