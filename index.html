@@ -208,10 +208,10 @@
             // Additional days as needed...
         };
 
-        function getDayIndex() {
-            const today = new Date();
-            return today.getDay(); // 0 (Sunday) to 6 (Saturday)
-        }
+          function getDayIndex() {
+        const today = new Date();
+        return today.getDay(); // 0 (Sunday) to 6 (Saturday)
+    }
 
         function updateEventStyles(todayIndex) {
             const timetableEntries = document.querySelectorAll(".timetable-entry");
@@ -259,33 +259,33 @@ function updateCheckboxState(dayIndex) {
     });
 }
 
- function renderTimetable(dayIndex) {
-    const timetableElement = document.getElementById("timetable");
-    const dayTitle = document.getElementById("dayTitle");
+        
+    function renderTimetable(dayIndex) {
+        const timetableElement = document.getElementById("timetable");
+        const dayTitle = document.getElementById("dayTitle");
 
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const selectedDay = daysOfWeek[dayIndex];
-    const selectedTimetable = timetable[selectedDay] || [];
+        const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const selectedDay = daysOfWeek[dayIndex];
+        const selectedTimetable = timetable[selectedDay] || [];
 
-    dayTitle.textContent = `${selectedDay}`;
+        dayTitle.textContent = `${selectedDay}`;
+        timetableElement.innerHTML = "";
 
-    timetableElement.innerHTML = "";
+        selectedTimetable.forEach((entry, index) => {
+            const entryElement = document.createElement("div");
+            entryElement.classList.add("timetable-entry");
 
-    selectedTimetable.forEach((entry, index) => {
-        const entryElement = document.createElement("div");
-        entryElement.classList.add("timetable-entry");
+            entryElement.innerHTML = `
+                <input type="checkbox">
+                <span class="time">${entry.time}:</span> <span class="event">${entry.event}</span>
+            `;
 
-        entryElement.innerHTML = `
-            <input type="checkbox">
-            <span class="time">${entry.time}:</span> <span class="event">${entry.event}</span>
-        `;
+            timetableElement.appendChild(entryElement);
+        });
 
-        timetableElement.appendChild(entryElement);
-    });
-
-    updateEventStyles(dayIndex);
-    updateCheckboxState(dayIndex); // Pass dayIndex here
-}
+        updateEventStyles(dayIndex);
+        updateCheckboxState(dayIndex);
+    }
 
 
         // Swipe gesture logic
@@ -346,38 +346,34 @@ function updateCheckboxState(dayIndex) {
         };
 
     // Your timetable and functions here
+ // Improved swipe gesture logic
+    let startX = 0;
+    let currentDayIndex = getDayIndex(); // Start with the current day
 
-        let startX = 0;
-        let currentDayIndex = getDayIndex(); // Initialize with the current day index
+    document.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX; // Record the touch start position
+    });
 
-        // Detect touch start
-        document.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-        });
+    document.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].clientX; // Record the touch end position
+        const distance = endX - startX;
 
-        // Detect touch move and end
-        document.addEventListener('touchend', (e) => {
-            const endX = e.changedTouches[0].clientX;
-            const distance = endX - startX;
-
-            if (Math.abs(distance) > 50) { // Set a threshold to detect meaningful swipes
-                if (distance < 0) {
-                    // Swipe left (next day)
-                    currentDayIndex = (currentDayIndex + 1) % 7; // Loop back to Sunday after Saturday
-                } else {
-                    // Swipe right (previous day)
-                    currentDayIndex = (currentDayIndex - 1 + 7) % 7; // Loop back to Saturday before Sunday
-                }
-
-                renderTimetable(currentDayIndex); // Render the timetable for the new day
+        if (Math.abs(distance) > 50) { // Set a threshold to detect meaningful swipes
+            if (distance < 0) {
+                // Swipe left (next day)
+                currentDayIndex = (currentDayIndex + 1) % 7; // Loop back to Sunday after Saturday
+            } else {
+                // Swipe right (previous day)
+                currentDayIndex = (currentDayIndex - 1 + 7) % 7; // Loop back to Saturday before Sunday
             }
-        });
 
-        // Initialize the timetable view with the current day
-        document.addEventListener("DOMContentLoaded", () => {
-            renderTimetable(currentDayIndex);
-        });
-    
+            renderTimetable(currentDayIndex); // Render the timetable for the new day
+        }
+    });
+
+    window.onload = () => {
+        renderTimetable(currentDayIndex); // Initialize with the current day's timetable
+    };
     </script>
 
 
