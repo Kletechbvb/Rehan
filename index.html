@@ -303,9 +303,9 @@ document.addEventListener('touchend', (event) => {
     const swipeDistance = touchEndX - touchStartX;
     const swipeThreshold = 100; // Adjust this value to change the swipe sensitivity
     if (swipeDistance > swipeThreshold) {
-        dayIndex = (dayIndex + 1) % 7; // Swipe right to next day
+        dayIndex = (dayIndex - 1 + 7) % 7; // Swipe left to previous day 
     } else if (swipeDistance < -swipeThreshold) {
-        dayIndex = (dayIndex - 1 + 7) % 7; // Swipe left to previous day
+       dayIndex = (dayIndex + 1) % 7; // Swipe right to next day
     }
     renderTimetable(dayIndex);
 });
