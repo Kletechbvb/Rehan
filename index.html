@@ -267,7 +267,7 @@ function updateCheckboxState(dayIndex) {
     const selectedDay = daysOfWeek[dayIndex];
     const selectedTimetable = timetable[selectedDay] || [];
 
-    dayTitle.textContent = `${selectedDay}'s Timetable`;
+    dayTitle.textContent = `${selectedDay}`;
 
     timetableElement.innerHTML = "";
 
@@ -345,12 +345,7 @@ function updateCheckboxState(dayIndex) {
             renderTimetable(todayIndex);
         };
 
-
-        
-    </script>
-
-        <script>
-        // Your timetable and functions here
+    // Your timetable and functions here
 
         let startX = 0;
         let currentDayIndex = getDayIndex(); // Initialize with the current day index
@@ -382,6 +377,10 @@ function updateCheckboxState(dayIndex) {
         document.addEventListener("DOMContentLoaded", () => {
             renderTimetable(currentDayIndex);
         });
+    
     </script>
+
+
+    
 </body>
 </html>
