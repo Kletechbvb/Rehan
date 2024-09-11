@@ -112,7 +112,7 @@
 
     <script>
         const timetable = {
-            Monday: [
+             Monday: [
                 { time: "8:00 am - 10:00 am", event: "Constitution of India (Class)" },
                 { time: "10:00 am - 4:00 pm", event: "Senior design project" },
                 { time: "4:30 pm - 5:30 pm", event: "Study session (Subject 1)" },
@@ -205,80 +205,61 @@
                 { time: "9:00 pm - 10:00 pm", event: "Job interview preparation" },
                 { time: "10:00 pm - 11:00 pm", event: "Wind down for bed" }
             ]
+            // Additional days as needed...
         };
 
         function getDayIndex() {
             const today = new Date();
             return today.getDay(); // 0 (Sunday) to 6 (Saturday)
         }
-function updateEventStyles(todayIndex) {
-    const timetableEntries = document.querySelectorAll(".timetable-entry");
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of the day
-    
-    timetableEntries.forEach((entry, index) => {
-        const eventTimeText = entry.querySelector(".time").textContent.trim();
-        const [hours, minutes] = eventTimeText.split(':')[0].split(' ')[0].split(':').map(Number);
-        const ampm = eventTimeText.split(':')[1].split(' ')[1].toLowerCase();
-        
-        // Adjust hours for AM/PM
-        const eventHours = (ampm === 'pm' && hours < 12) ? hours + 12 : (ampm === 'am' && hours === 12) ? 0 : hours;
-        
-        const eventDate = new Date(today);
-        eventDate.setHours(eventHours, minutes, 0, 0);
-        
-        const isPastEvent = eventDate < new Date();
-        const isTodayEvent = eventDate.toDateString() === today.toDateString();
-        const checkbox = entry.querySelector("input[type='checkbox']");
-        
-        if (isPastEvent) {
-            entry.classList.add("dull");
-            checkbox.disabled = true;
-        } else {
-            entry.classList.remove("dull");
-            checkbox.disabled = false;
+
+        function updateEventStyles(todayIndex) {
+            const timetableEntries = document.querySelectorAll(".timetable-entry");
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to start of the day
+            
+            timetableEntries.forEach((entry, index) => {
+                const eventTimeText = entry.querySelector(".time").textContent.trim();
+                const [hours, minutes] = eventTimeText.split(':')[0].split(' ')[0].split(':').map(Number);
+                const ampm = eventTimeText.split(':')[1].split(' ')[1].toLowerCase();
+                
+                // Adjust hours for AM/PM
+                const eventHours = (ampm === 'pm' && hours < 12) ? hours + 12 : (ampm === 'am' && hours === 12) ? 0 : hours;
+                
+                const eventDate = new Date(today);
+                eventDate.setHours(eventHours, minutes, 0, 0);
+                
+                const isPastEvent = eventDate < new Date();
+                const checkbox = entry.querySelector("input[type='checkbox']");
+                
+                if (isPastEvent) {
+                    entry.classList.add("dull");
+                    checkbox.disabled = true;
+                } else {
+                    entry.classList.remove("dull");
+                    checkbox.disabled = false;
+                }
+            });
         }
-    });
-}
 
-
-
-
-function isToday(date) {
-    const today = new Date();
-    return date.getFullYear() === today.getFullYear() &&
-           date.getMonth() === today.getMonth() &&
-           date.getDate() === today.getDate();
-}
-
-
-function getEndOfWeekTimestamp() {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    const daysUntilSunday = (7 - dayOfWeek) % 7;
-    const endOfWeek = new Date(today);
-    endOfWeek.setDate(today.getDate() + daysUntilSunday);
-    endOfWeek.setHours(23, 59, 59, 999);
-    return endOfWeek.getTime();
-}
-
-function updateCheckboxState() {
+function updateCheckboxState(dayIndex) {
     const checkboxes = document.querySelectorAll("input[type='checkbox']");
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const currentDay = daysOfWeek[dayIndex];
+
     checkboxes.forEach((checkbox, index) => {
-        const storageKey = `checkbox-${index}`;
+        const storageKey = `${currentDay}-checkbox-${index}`; // Include the day in the key
         const storedState = localStorage.getItem(storageKey);
         if (storedState !== null) {
             checkbox.checked = JSON.parse(storedState);
         }
         checkbox.addEventListener('change', () => {
-            if (Date.now() < getEndOfWeekTimestamp()) {
-                localStorage.setItem(storageKey, checkbox.checked);
-            }
+            localStorage.setItem(storageKey, checkbox.checked);
         });
     });
 }
 
-function renderTimetable(dayIndex) {
+ function renderTimetable(dayIndex) {
     const timetableElement = document.getElementById("timetable");
     const dayTitle = document.getElementById("dayTitle");
 
@@ -303,15 +284,66 @@ function renderTimetable(dayIndex) {
     });
 
     updateEventStyles(dayIndex);
-    updateCheckboxState(); // Call to update the checkbox state from local storage
+    updateCheckboxState(dayIndex); // Pass dayIndex here
 }
 
 
-        // Initialize the timetable view with the current day
-        document.addEventListener("DOMContentLoaded", () => {
+        // Swipe gesture logic
+        let xDown = null;
+        let yDown = null;
+
+        function getTouches(evt) {
+            return evt.touches || evt.originalEvent.touches;
+        }
+
+        function handleTouchStart(evt) {
+            const firstTouch = getTouches(evt)[0];
+            xDown = firstTouch.clientX;
+            yDown = firstTouch.clientY;
+        }
+
+        function handleTouchMove(evt) {
+            if (!xDown || !yDown) {
+                return;
+            }
+
+            const xUp = evt.touches[0].clientX;
+            const yUp = evt.touches[0].clientY;
+
+            const xDiff = xDown - xUp;
+            const yDiff = yDown - yUp;
+
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                if (xDiff > 0) {
+                    showNextDay();
+                } else {
+                    showPreviousDay();
+                }
+            }
+
+            xDown = null;
+            yDown = null;
+        }
+
+        function showNextDay() {
+            let dayIndex = getDayIndex();
+            dayIndex = (dayIndex + 1) % 7;
+            renderTimetable(dayIndex);
+        }
+
+        function showPreviousDay() {
+            let dayIndex = getDayIndex();
+            dayIndex = (dayIndex - 1 + 7) % 7;
+            renderTimetable(dayIndex);
+        }
+
+        document.addEventListener("touchstart", handleTouchStart, false);
+        document.addEventListener("touchmove", handleTouchMove, false);
+
+        window.onload = () => {
             const todayIndex = getDayIndex();
             renderTimetable(todayIndex);
-        });
+        };
     </script>
 </body>
 </html>
