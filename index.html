@@ -257,7 +257,7 @@ function renderTimetable(dayIndex) {
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const selectedDay = daysOfWeek[dayIndex];
     const selectedTimetable = timetable[selectedDay] || [];
-    dayTitle.textContent = `${selectedDay}`;
+    dayTitle.textContent = `${selectedDay}    `;
 
     timetableElement.innerHTML = "";  // Clear previous content
     
